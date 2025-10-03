@@ -1,3 +1,4 @@
 discord.py[voice]
 edge-tts
+gtts
 Flask
