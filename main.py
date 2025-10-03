@@ -1,7 +1,23 @@
 import os
+import threading
+from flask import Flask
 import discord
 from discord.ext import commands
 from gtts import gTTS
+
+# Flask app
+app = Flask(__name__)
+
+@app.route("/")
+def home():
+    return "Bot is running!"
+
+def run_flask():
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
+
+# Start Flask in background thread
+threading.Thread(target=run_flask).start()
 
 TOKEN = os.environ["DISCORD_TOKEN"]  # replace with your token directly for now
 
@@ -53,3 +69,4 @@ async def on_message(message):
     await bot.process_commands(message)
 
 bot.run(TOKEN)
+
