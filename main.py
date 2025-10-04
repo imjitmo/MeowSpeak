@@ -14,7 +14,7 @@ intents.members = True
 
 bot = commands.Bot(command_prefix="!", intents=intents)
 
-TEXT_CHANNEL_ID = os.environ["CHANNEL_ID"]  # replace with your text channel ID
+TEXT_CHANNEL_ID = os.environ["CHANNEL_ID", "CHANNEL_ID_2"]  # replace with your text channel ID
 
 # Track last activity per guild
 last_activity = {}
@@ -80,3 +80,4 @@ async def check_timeout():
 
 
 bot.run(TOKEN)
+
