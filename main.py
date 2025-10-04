@@ -30,7 +30,6 @@ intents.members = True
 bot = commands.Bot(command_prefix="!", intents=intents)
 
 TEXT_CHANNEL_ID = os.environ["CHANNEL_ID"]  # replace with your text channel ID
-TEXT_CHANNEL_ID_2 = os.environ["CHANNEL_ID_2"]
 
 # Track last activity per guild
 last_activity = {}
@@ -52,7 +51,7 @@ async def on_message(message):
 
     print(f"DEBUG: Got message in {message.channel.id}: {message.content}")
 
-    if message.channel.id != TEXT_CHANNEL_ID or message.channel.id != TEXT_CHANNEL_ID_2:
+    if message.channel.id != TEXT_CHANNEL_ID:
         return
 
     if message.author.voice and message.author.voice.channel:
