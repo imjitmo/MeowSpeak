@@ -1,10 +1,25 @@
 import os
+import threading
+from flask import Flask
 import discord
-from discord.ext import commands, tasks
+from discord.ext import commands
 from gtts import gTTS
-import asyncio
 
-TOKEN = os.environ["DISCORD_TOKEN"]
+# Flask app
+app = Flask(__name__)
+
+@app.route("/")
+def home():
+    return "Bot is running!"
+
+def run_flask():
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
+
+# Start Flask in background thread
+threading.Thread(target=run_flask).start()
+
+TOKEN = os.environ["DISCORD_TOKEN"]  # replace with your token directly for now
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -14,20 +29,11 @@ intents.members = True
 
 bot = commands.Bot(command_prefix="!", intents=intents)
 
-TEXT_CHANNEL_ID = os.environ["CHANNEL_ID"]  # replace with your text channel ID
-
-# Track last activity per guild
-last_activity = {}
-
-# Timeout in seconds (15 minutes = 900 seconds)
-IDLE_TIMEOUT = 15 * 60
-
+TEXT_CHANNEL_ID = 1423696468497141800  # replace with your text channel ID
 
 @bot.event
 async def on_ready():
     print(f"{bot.user} is online and ready!")
-    check_timeout.start()
-
 
 @bot.event
 async def on_message(message):
@@ -60,24 +66,6 @@ async def on_message(message):
             audio = discord.FFmpegPCMAudio(temp_path)
             voice_client.play(audio, after=lambda e: print("TTS finished:", e))
 
-        # Update last activity timestamp
-        last_activity[message.guild.id] = asyncio.get_event_loop().time()
-
     await bot.process_commands(message)
 
-
-@tasks.loop(seconds=60)
-async def check_timeout():
-    """Disconnect the bot if idle for more than IDLE_TIMEOUT."""
-    now = asyncio.get_event_loop().time()
-    for guild_id, last_time in list(last_activity.items()):
-        if now - last_time > IDLE_TIMEOUT:
-            guild = bot.get_guild(guild_id)
-            if guild and guild.voice_client:
-                print(f"⏳ Timeout reached, disconnecting from {guild.name}")
-                await guild.voice_client.disconnect()
-                last_activity.pop(guild_id, None)
-
-
 bot.run(TOKEN)
-
